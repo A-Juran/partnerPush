@@ -14,7 +14,12 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "wx")
 public class WxConfigure {
-
+    //wx appID
     public String app_id;
+    //wx appSecret
     public String app_secret;
+    //wx get-access-token
+    public String app_get_access_token;
+    //wx app-send-msg
+    public String app_send_msg;
 }

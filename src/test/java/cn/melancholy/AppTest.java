@@ -1,7 +1,5 @@
 package cn.melancholy;
 
-import static org.junit.Assert.assertTrue;
-
 import cn.melancholy.config.WxConfigure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +22,6 @@ public class AppTest
     @Test
     public void shouldAnswerWithTrue()
     {
-        System.out.println(wxConfigure.getApp_secret());
+        System.out.println(wxConfigure.getApp_id());
     }
 }

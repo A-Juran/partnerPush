@@ -19,11 +19,10 @@ public class ScheduleConfig {
      */
     @Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler(){
-
         log.info("线程池创建");
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
         //设置线程池数量
-        threadPoolTaskScheduler.setPoolSize(20);
+        threadPoolTaskScheduler.setPoolSize(30);
         threadPoolTaskScheduler.setThreadNamePrefix("partnerPush-");
         threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
         threadPoolTaskScheduler.setAwaitTerminationSeconds(60);

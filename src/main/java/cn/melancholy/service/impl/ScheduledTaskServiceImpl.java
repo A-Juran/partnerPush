@@ -4,13 +4,11 @@ import cn.melancholy.entity.ScheduledJob;
 import cn.melancholy.service.PartnerService;
 import cn.melancholy.service.ScheduledTaskService;
 import cn.melancholy.taskController.task.TaskRunnable;
-import cn.melancholy.util.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Map;
@@ -109,15 +107,19 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
         if(sj.getStatus().intValue() != 1)
             return;
         Class<?> clazz;
-        TaskRunnable task;
+        //TaskRunnable task;
         try {
             clazz = Class.forName(sj.getJobKey());
-            task = (TaskRunnable) SpringContextUtil.getBean(clazz);
+            //task = (TaskRunnable) SpringContextUtil.getBean(clazz);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("spring_scheduled_cron表数据" + sj.getJobKey() + "有误", e);
         }
-        Assert.isAssignable(TaskRunnable.class, task.getClass(), "定时任务类必须实现ScheduledOfTask接口");
-        ScheduledFuture scheduledFuture = threadPoolTaskScheduler.schedule(task,(triggerContext -> new CronTrigger(sj.getCronExpression()).nextExecutionTime(triggerContext)));
+        //断言 犹如if/else task 是否实现TaskRunnable接口
+        //Assert.isAssignable(TaskRunnable.class, task.getClass(), "定时任务类必须是TaskRunnable接口");
+        //启用定时器
+        ScheduledFuture scheduledFuture = threadPoolTaskScheduler.schedule(new TaskRunnable(sj),
+                (triggerContext -> new CronTrigger(sj.getCronExpression()).nextExecutionTime(triggerContext)));
+        //将已经执行的线程放入concurrentMap中。
         scheduledFutureMap.put(sj.getJobKey(),scheduledFuture);
     }
  
