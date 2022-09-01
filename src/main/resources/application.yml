@@ -4,8 +4,8 @@ server:
 
 #wecheat configure
 wx:
-  app-id: wx2841260659a85996
-  app-secret: 787d741294fed53a2d667171b6c5bfaa
+  app-id: wxf09d0ff55963b2f4
+  app-secret: b2d8a1fd9b72c1b60045bc0de14e8b93
   app-get-access-token: https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=id&secret=sec
   app-send-msg: https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=token
 

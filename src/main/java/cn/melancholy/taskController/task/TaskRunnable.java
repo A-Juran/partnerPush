@@ -29,6 +29,7 @@ public class TaskRunnable implements Runnable {
         Class<?> clazz;
         WxConfigure wxConfigure;
         try {
+            //通过反射机制拿到Spring容器中的WxConfigure配置信息
             clazz = Class.forName("cn.melancholy.config.WxConfigure");
             wxConfigure = (WxConfigure) SpringContextUtil.getBean(clazz);
         } catch (ClassNotFoundException e) {
