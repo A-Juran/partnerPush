@@ -1,0 +1,16 @@
+#start service configure
+server:
+  port: 5678
+
+#wecheat configure
+wx:
+  app-id: wx2841260659a85996
+  app-secret: 787d741294fed53a2d667171b6c5bfaa
+
+#mysql configure
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://127.0.0.1:3306/partnerPush?userUnicode=true&characterEncoding=UTF8&useSSL=false
