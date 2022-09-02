@@ -31,7 +31,6 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-        <!--mybatis-->
         <!--mybatis-plus-->
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -53,6 +52,17 @@
             <groupId>org.mybatis.generator</groupId>
             <artifactId>mybatis-generator-core</artifactId>
             <version>1.4.1</version>
+        </dependency>
+        <!--httpClients-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>2.0.12</version>
         </dependency>
         <dependency>
             <groupId>org.mybatis.generator</groupId>

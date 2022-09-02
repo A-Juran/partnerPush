@@ -22,4 +22,6 @@ public class WxConfigure {
     public String app_get_access_token;
     //wx app-send-msg
     public String app_send_msg;
+    //access_token
+    public String access_token;
 }
