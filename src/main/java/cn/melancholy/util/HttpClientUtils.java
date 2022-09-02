@@ -46,8 +46,9 @@ public class HttpClientUtils {
 
         httpclient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(remoteUrl);
+        StringEntity s = new StringEntity(parameter.toJSONString(),"UTF-8");
         httpPost.addHeader("Content-Type", "application/json;charset=UTF-8");
-        httpPost.setEntity(new StringEntity(parameter.toJSONString()));
+        httpPost.setEntity(new StringEntity(parameter.toJSONString(),"UTF-8"));
 
         return executeRequest(requestConfig, httpPost, encode);
     }

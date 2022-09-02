@@ -24,4 +24,9 @@ public class WxConfigure {
     public String app_send_msg;
     //access_token
     public String access_token;
+    //yiYan
+    public String app_yy_tips;
+    //百度地图ACK
+    public String app_baidu_ack;
+
 }

@@ -4,10 +4,14 @@ server:
 
 #wecheat configure
 wx:
-  app-id: wx2841260659a85996
-  app-secret: 787d741294fed53a2d667171b6c5bfaa
+  app-id: appid
+  app-secret: secret
   app-get-access-token: https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential
   app-send-msg: https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=
+  #hito 一言接口
+  app-yy-tips: https://v1.hitokoto.cn/?c=j
+  #baidu
+  app_baidu_ack: #地图acp
 
 #mysql configure
 spring:

@@ -9,6 +9,10 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,27 +57,76 @@ public class TaskRunnable implements Runnable {
         /*
             进行信息推送
          */
+        //对
+        String[] split = scheduledJob.getPushContext().trim().split("\\|");
+
+        /*
+            获取城市信息
+            一言短句
+         */
+        String baiduWeather = "https://api.map.baidu.com/weather/v1/?district_id=" + split[0] + "&data_type=all&ak=" + wxConfigure.getApp_baidu_ack();
+        String baiduLocal = null;
+        String yy = null;
+        JSONObject baiduJsonObject;
+        JSONObject yyJsonObject;
+        try {
+            baiduLocal = HttpClientUtils.doGet(baiduWeather, null);
+            baiduJsonObject = JSONObject.parseObject(baiduLocal);
+            yy = HttpClientUtils.doGet(wxConfigure.getApp_yy_tips(), null);
+            yyJsonObject = JSONObject.parseObject(yy);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+        //设置发送数据
         JSONObject sedMsgObject = new JSONObject();
         sedMsgObject.put("touser", scheduledJob.getPushWx());
-        System.out.println(scheduledJob.getPushTemplate());
         sedMsgObject.put("template_id", scheduledJob.getPushTemplate());
-        //data数据对象
+
+
         JSONObject data = new JSONObject();
-        data.put("first", toJson("2022-09-01", null));
-        data.put("keyword1", toJson("06月07日 19时24分", null));
-        data.put("keyword2", toJson("2", null));
+        /**
+         * 时间
+         * 城市
+         * 温度
+         * 恋爱时长
+         * ta的生日
+         * 我的生日
+         * 一言
+         */
+        data.put("data", toJson(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                null));
+
+        data.put("ctiy", toJson(String.valueOf(baiduJsonObject.getJSONObject("result")
+                .getJSONObject("location")
+                .get("name")), "#5B86E5"));
+
+        data.put("temperature", toJson(String.valueOf(baiduJsonObject.getJSONObject("result")
+                .getJSONObject("now")
+                .get("temp")) + "℃", "#FFFFCC"));
+
+        data.put("startTime", toJson(String.valueOf((new Date().getTime() - Long.parseLong(split[1])) / (24 * 3600 * 1000)),
+                "#3B2667"));
+
+        data.put("he", toJson(String.valueOf(getBirthDay(getFormatDay(Long.parseLong(split[2])))),
+                "#FFB75E"));
+
+        data.put("mine", toJson(String.valueOf(getBirthDay(getFormatDay(Long.parseLong(split[3])))),
+                "#FFB75E"));
+
+        data.put("hitokoto", toJson(String.valueOf(yyJsonObject.get("hitokoto")), "#457FCA"));
 
         sedMsgObject.put("data", data);
 
-        System.out.println(sedMsgObject.toString() + "这是要发送的json数据");
-
         try {
-            String post = HttpClientUtils.doPost(wxConfigure.app_send_msg + wxConfigure.access_token, sedMsgObject, null);
+            String post = HttpClientUtils.doPost(wxConfigure.app_send_msg + wxConfigure.access_token,
+                    sedMsgObject,
+                    null);
             System.out.println(post);
             Map<String, Object> map = jsonChangeObject(post, "errcode", "errmsg");
             if (Integer.parseInt(String.valueOf(map.get("errcode"))) == 41006)
                 getAccessToken(wxConfigure);
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -120,6 +173,35 @@ public class TaskRunnable implements Runnable {
         if (color != null)
             json.put("color", color);//消息字体颜色
         return json;
+    }
+
+    public int getBirthDay(String addtime) {
+        int days = 0;
+        try {
+            SimpleDateFormat myFormatter = new SimpleDateFormat("yyyy-MM-dd");
+            String clidate = addtime;
+            Calendar cToday = Calendar.getInstance(); // 存今天
+            Calendar cBirth = Calendar.getInstance(); // 存生日
+            cBirth.setTime(myFormatter.parse(clidate)); // 设置生日
+            cBirth.set(Calendar.YEAR, cToday.get(Calendar.YEAR)); // 修改为本年
+            if (cBirth.get(Calendar.DAY_OF_YEAR) < cToday.get(Calendar.DAY_OF_YEAR)) {
+                // 生日已经过了，要算明年的了
+                days = cToday.getActualMaximum(Calendar.DAY_OF_YEAR) - cToday.get(Calendar.DAY_OF_YEAR);
+                days += cBirth.get(Calendar.DAY_OF_YEAR);
+            } else {
+                // 生日还没过
+                days = cBirth.get(Calendar.DAY_OF_YEAR) - cToday.get(Calendar.DAY_OF_YEAR);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return days;
+    }
+
+    public String getFormatDay(Long time) {
+        Date date = new Date(time);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return simpleDateFormat.format(date);
     }
 
 }
