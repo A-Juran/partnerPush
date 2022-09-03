@@ -10,7 +10,7 @@ wx:
   app-send-msg: https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=
   #hito
   app-yy-tips: https://v1.hitokoto.cn/?c=j
-  #baidu
+  #baidu天气接口ack
   app_baidu_ack:
 
 #mysql configure
