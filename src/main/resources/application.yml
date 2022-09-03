@@ -4,14 +4,14 @@ server:
 
 #wecheat configure
 wx:
-  app-id: appid
-  app-secret: secret
+  app-id:
+  app-secret:
   app-get-access-token: https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential
   app-send-msg: https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=
-  #hito 一言接口
+  #hito
   app-yy-tips: https://v1.hitokoto.cn/?c=j
   #baidu
-  app_baidu_ack: #地图acp
+  app_baidu_ack:
 
 #mysql configure
 spring:
@@ -19,4 +19,4 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 123456
-    url: jdbc:mysql://127.0.0.1:3306/partnerPush?userUnicode=true&characterEncoding=UTF8&useSSL=false
+    url: jdbc:mysql://127.0.0.1:3306/partnerpush?userUnicode=true&characterEncoding=UTF8&useSSL=false
