@@ -1,9 +1,13 @@
 package cn.melancholy.service.impl;
 
+import cn.melancholy.config.WxConfigure;
 import cn.melancholy.entity.ScheduledJob;
 import cn.melancholy.service.PartnerService;
 import cn.melancholy.service.ScheduledTaskService;
 import cn.melancholy.taskController.task.TaskRunnable;
+import cn.melancholy.util.HttpClientUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -25,6 +29,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
      */
     private ReentrantLock lock = new ReentrantLock();
 
+
     /**
      * 定时任务线程池
      */
@@ -36,8 +41,15 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
      */
     public Map<String, ScheduledFuture> scheduledFutureMap = new ConcurrentHashMap<>();
 
+    /**
+     * Service
+     */
     @Autowired
-    private PartnerService partnerService;
+    public PartnerService partnerService;
+
+
+    @Autowired
+    private WxConfigure wxConfigure;
 
     @Override
     public Boolean start(ScheduledJob scheduledJob) {
@@ -99,6 +111,40 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
         return this.start(scheduledJob);
     }
 
+    @Override
+    public void initTask() {
+        getAccessToken();
+        //获取token
+        //启动线程
+        List<ScheduledJob> list = partnerService.list();
+        for (ScheduledJob sj : list) {
+            if (sj.getStatus().intValue() == -1) //未启用
+                continue;
+            doStartTask(sj);
+        }
+    }
+
+    /**
+     * 设置token
+     *
+     * @throws Exception
+     */
+    public void getAccessToken() {
+        String getJson = null;
+        try {
+            getJson = HttpClientUtils.doGet(wxConfigure.getApp_get_access_token() + "&appid=" +
+                    wxConfigure.getApp_id() + "&secret=" +
+                    wxConfigure.getApp_secret(), null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        JSONObject jsonObject = JSON.parseObject(getJson);
+        String access_token = (String) jsonObject.get("access_token");
+
+        log.info("初始化AccessToken");
+        wxConfigure.setAccess_token(access_token);
+    }
+
     /**
      * 执行启动任务
      */
@@ -111,16 +157,6 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                 (triggerContext -> new CronTrigger(sj.getCronExpression()).nextExecutionTime(triggerContext)));
         //将已经执行的线程放入concurrentMap中。
         scheduledFutureMap.put(sj.getJobKey(), scheduledFuture);
-    }
-
-    @Override
-    public void initTask() {
-        List<ScheduledJob> list = partnerService.list();
-        for (ScheduledJob sj : list) {
-            if (sj.getStatus().intValue() == -1) //未启用
-                continue;
-            doStartTask(sj);
-        }
     }
 
 }

@@ -78,12 +78,10 @@ public class TaskRunnable implements Runnable {
             throw new RuntimeException(e);
         }
 
-
         //设置发送数据
         JSONObject sedMsgObject = new JSONObject();
         sedMsgObject.put("touser", scheduledJob.getPushWx());
         sedMsgObject.put("template_id", scheduledJob.getPushTemplate());
-
 
         JSONObject data = new JSONObject();
         /**
@@ -119,19 +117,27 @@ public class TaskRunnable implements Runnable {
 
         sedMsgObject.put("data", data);
 
+        //提示信息发送。
         try {
-            String post = HttpClientUtils.doPost(wxConfigure.app_send_msg + wxConfigure.access_token,
+            String post = null;
+            post = HttpClientUtils.doPost(wxConfigure.app_send_msg + wxConfigure.access_token,
                     sedMsgObject,
                     null);
-            System.out.println(post);
+
+            //如果token 失效或超时/重新生成token
             Map<String, Object> map = jsonChangeObject(post, "errcode", "errmsg");
-            if (Integer.parseInt(String.valueOf(map.get("errcode"))) == 41006)
+            if (Integer.parseInt(String.valueOf(map.get("errcode"))) == 41006 ||
+                    Integer.parseInt(String.valueOf(map.get("errcode"))) == 42001){
                 getAccessToken(wxConfigure);
+                HttpClientUtils.doPost(wxConfigure.app_send_msg + wxConfigure.access_token,
+                        sedMsgObject,
+                        null);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        log.info("推送成功，推送公众号AppId为==" + wxConfigure.getApp_id());
+        log.info("推送成功，推送微信号为==" + scheduledJob.getPushWx());
     }
 
     /**
@@ -155,6 +161,7 @@ public class TaskRunnable implements Runnable {
         wxConfigure.setAccess_token(access_token);
     }
 
+
     /**
      * 从Json 中获取信息
      */
@@ -166,7 +173,7 @@ public class TaskRunnable implements Runnable {
         }
         return hashMap;
     }
-
+    //封装json
     public JSONObject toJson(String value, String color) {
         JSONObject json = new JSONObject();
         json.put("value", value);
@@ -175,6 +182,7 @@ public class TaskRunnable implements Runnable {
         return json;
     }
 
+    //获得生日天数。
     public int getBirthDay(String addtime) {
         int days = 0;
         try {
@@ -198,6 +206,7 @@ public class TaskRunnable implements Runnable {
         return days;
     }
 
+    //时间戳转换时间
     public String getFormatDay(Long time) {
         Date date = new Date(time);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
